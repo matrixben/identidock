@@ -34,7 +34,7 @@ def get_identicon(name):
         image = res.content
         cache.set(name, image)
     else:
-    	print('use redis.')
+    	print('use redis.', flush=True)
 
     return Response(image, mimetype='image/png')
 
