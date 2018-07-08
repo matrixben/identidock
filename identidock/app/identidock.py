@@ -1,6 +1,7 @@
 from flask import Flask, Response, request
 import requests
 import redis
+import html
 
 
 app = Flask(__name__)
@@ -11,7 +12,8 @@ cache = redis.StrictRedis(host='redis', port=6379, db=0)
 def hello_world():
     name = 'jason'
     if request.method == 'POST':
-        name = request.form['name']
+        # 将用户输入值中的特殊符号转义，以免跨站脚本攻击
+        name = html.escape(request.form['name'], quote=True)
 
     header = '<html><head><title>On Identidock</title></head><body>'
     body = '''<form method="POST">
@@ -28,6 +30,7 @@ def hello_world():
 
 @app.route('/monster/<name>')
 def get_identicon(name):
+    name = html.escape(name, quote=True)
     image = cache.get(name)
     if image is None:
         res = requests.get('http://dnmonster:8080/monster/' + name + '?size=80')
